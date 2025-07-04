@@ -15,15 +15,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    _homeBloc.add(HomeInitialEvent()); //runs at the first
+    homeBloc.add(HomeInitialEvent()); //runs at the first
     super.initState();
   }
 
-  final HomeBloc _homeBloc = HomeBloc();
+  final HomeBloc homeBloc = HomeBloc();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeBloc, HomeState>(
-      bloc: _homeBloc,
+      bloc: homeBloc,
       listenWhen:
           (previous, current) =>
               current is HomeActionState, //here the actions are handled
@@ -41,6 +41,14 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(builder: (context) => WishlistPage()),
           );
+        } else if (state is ProductAddedToCart) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Product added to cart')));
+        } else if (state is ProductAddedToWishlist) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Product added to wishlist')));
         }
       },
       builder: (context, state) {
@@ -56,13 +64,13 @@ class _HomePageState extends State<HomePage> {
                 actions: [
                   IconButton(
                     onPressed: () {
-                      _homeBloc.add(HomeProductWishlistButtonClickedEvent());
+                      homeBloc.add(HomeWishlistButtonNavigateEvent());
                     },
                     icon: Icon(Icons.favorite_border),
                   ),
                   IconButton(
                     onPressed: () {
-                      _homeBloc.add(HomeProductCartButtonClickedEvent());
+                      homeBloc.add(HomeCartButtonNavigateEvent());
                     },
                     icon: Icon(Icons.shopping_cart),
                   ),
@@ -73,6 +81,7 @@ class _HomePageState extends State<HomePage> {
                 itemBuilder: (context, index) {
                   return ProductTilePage(
                     homeProductData: successstate.products[index],
+                    homeBloc: homeBloc,
                   );
                 },
               ),
